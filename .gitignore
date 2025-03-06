@@ -163,6 +163,3 @@ cython_debug/
 
 # Data files
 data/
-
-# Virtual environment
-power_env/
