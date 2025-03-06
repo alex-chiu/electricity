@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from pathlib import Path
 
 import numpy as np
@@ -35,7 +37,9 @@ def calculate_exact_costs(plan_info: dict[float], usage_history: np.array) -> np
     return monthly_costs
 
 
-def calculate_dispersions(num_runs: int, sigma: float, plan_info: dict[float], usage_history: np.array) -> np.array:
+def calculate_dispersions(
+    num_runs: int, sigma: float, plan_info: dict[float], usage_history: np.array
+) -> np.array:
     delta_kWh = np.random.normal(loc=0, scale=sigma, size=num_runs)
 
     total_costs = np.empty((usage_history.size,))
@@ -49,8 +53,13 @@ def calculate_dispersions(num_runs: int, sigma: float, plan_info: dict[float], u
 
 def main():
     # Get top level of git repository
-    result = subprocess.run(["git", "rev-parse", "--show-toplevel"],
-                            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
+    result = subprocess.run(
+        ["git", "rev-parse", "--show-toplevel"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        check=True,
+    )
     root = Path(result.stdout.strip())
 
     # Paths to your JSON and CSV files
@@ -67,12 +76,13 @@ def main():
     print(f"historical avg: ${round(prev_monthly_bill, 2)}")
 
     for plan in plan_dict:
-        plan_exact_costs = calculate_exact_costs(
-            plan_dict[plan], df["kWh"].values)
+        plan_exact_costs = calculate_exact_costs(plan_dict[plan], df["kWh"].values)
         df[plan] = plan_exact_costs
         print(f"{plan} avg: ${round(df[plan].mean(), 2)}")
 
-        dispersed_costs = calculate_dispersions(1000, 50, plan_dict[plan], df["kWh"].values)
+        dispersed_costs = calculate_dispersions(
+            1000, 50, plan_dict[plan], df["kWh"].values
+        )
         dispersed_plan = f"{plan}_dispersed"
         df[dispersed_plan] = dispersed_costs
         print(f"{dispersed_plan} avg: ${round(df[dispersed_plan].mean(), 2)}")
